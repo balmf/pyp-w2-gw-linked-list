@@ -55,10 +55,11 @@ class Node(object):
     def __eq__(self, other):
         if not isinstance(other, Node):
             return False
+        
         return self.elem == other.elem and self.next == other.next
 
     def __repr__(self):
-        repr(self.elem)
+        return "The value of elem: {0}  The value of next: {1}".format(self.elem, self.next)
 
 
 class LinkedList(AbstractLinkedList):
@@ -82,9 +83,6 @@ class LinkedList(AbstractLinkedList):
     
 
     def __str__(self):
-
-        if not self.start:
-            return "[]"
         lst = [str(el) for el in self]
         
         return "[" + ", ".join(lst) + "]"
@@ -93,32 +91,24 @@ class LinkedList(AbstractLinkedList):
         return self.count()
 
     def __iter__(self):
-        if self.start:
-            node = self.start
-            while node:
-                yield node.elem
-                if not node.next:
-                    break
-                node = node.next
+        return (node.elem for node in self.iterate_nodes())
         
-            
 
     def __getitem__(self, index):
         if index < 0:
             index = len(self) + index
-        count = 0
-        for elem in self:
+            
+        for count, elem in enumerate(self):
             if count == index:
                 return elem
-            count += 1
+
             
 
     def __add__(self, other):
         
         new_list = [el for el in self]
         new_list += [el for el in other]
-        
-            
+
         return LinkedList(new_list)
 
     def __iadd__(self, other):
@@ -129,17 +119,20 @@ class LinkedList(AbstractLinkedList):
         return self
 
     def __eq__(self, other):
-        if not type(self) == type(other):
-            return False
-        if not len(self) == len(other):
-            return False
-            
+
         for el1, el2 in zip(self, other):
             if el1 != el2:
                 return False
-        return True
                 
-
+        return len(self) == len(other)
+                
+    def iterate_nodes(self):
+        if self.start:
+            node = self.start
+            while node:
+                yield node
+                node = node.next
+                
     def append(self, elem):
         node = Node(elem)
         if self.end:
@@ -153,57 +146,38 @@ class LinkedList(AbstractLinkedList):
 
     def count(self):
         count = 0
-        for el in self:
+        for _ in self:
             count += 1
         return count
 
+
     def pop(self, index=None):
     
-        if self.end == None:
-            raise IndexError()
-        
         if index is None:
             index = len(self) - 1
+    
+        if self.end is None or index >= len(self):
+            raise IndexError()
             
         output = self[index]
         
         if index == 0:
-            if len(self) == 1:
-                self.start = None
-                self.end = None
-            try:
-                self.start = self.get_node(1)
-            except:
-                self.start = None
-                
+           self.start = self.start.next
         else:
             node_before_pop = self.get_node(index - 1)
-            node_to_pop = self.get_node(index)
-            
-            try:
-                node_after_pop = self.get_node(index+1)
-            except:
-                node_after_pop = None
+            node_to_be_popped = self.get_node(index)
+            node_after_pop =  node_to_be_popped.next
             
             node_before_pop.next = node_after_pop 
             
-            
-            self.start = self.get_node(0)
-            self.end = self.get_node(-1)
-
         return output
     
     def get_node(self, index):
         if index < 0:
             index = len(self) + index
-        node = self.start
-        count = 0
-        while node.next:
+            
+        for count, node in enumerate(self.iterate_nodes()):
             if count == index:
                 return node
-            count += 1
-            node = node.next
-            
-        if count < index:
-            raise IndexError("Out of range")
-        return node
+
+        raise IndexError("Out of range")

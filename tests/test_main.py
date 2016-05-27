@@ -36,6 +36,7 @@ class LinkedListTestCase(unittest.TestCase):
         self.assertEqual(my_list.start.next.next, None)
 
         self.assertEqual(my_list.count(), 2)
+        
 
     def test_count(self):
         self.assertEqual(LinkedList([1, 2, 3]).count(), 3)
@@ -47,6 +48,7 @@ class LinkedListTestCase(unittest.TestCase):
         self.assertEqual(elem, 3)
         self.assertEqual(l1.count(), 2)
         self.assertEqual(l1, LinkedList([1, 2]))
+        
 
     def test_pop_removes_first_item(self):
         l1 = LinkedList([1, 2, 3])
@@ -131,6 +133,11 @@ class LinkedListTestCase(unittest.TestCase):
         self.assertNotEqual(
             LinkedList([1]),
             LinkedList([]))
+            
+        self.assertNotEqual(
+            LinkedList([1]),
+            LinkedList([3]))
+
 
     def test_add_list(self):
         my_list = LinkedList()
@@ -182,3 +189,67 @@ class LinkedListTestCase(unittest.TestCase):
         my_list += LinkedList()
         self.assertEqual(my_list.count(), 0)
         self.assertEqual(my_list, LinkedList())
+        
+    def test_get_item(self):
+        my_list = [1,2,3,4]
+        my_linked_list = LinkedList(my_list)
+        i = 0
+        while i < len(my_list):
+            self.assertEqual(my_list[i], my_linked_list[i])
+            i += 1
+    
+    def test_get_item_neg(self):
+        my_list = [1,2,3,4]
+        my_linked_list = LinkedList(my_list)
+        i = 1
+        
+        while i <= len(my_list):
+            self.assertEqual(my_list[-i], my_linked_list[-i])
+            i += 1
+        
+    def test_get_node(self):
+        my_list = [1,2,3,4]
+        lst = LinkedList(my_list)
+        
+        self.assertEqual(lst.get_node(-1).elem, 4)
+        
+    def test_get_node_raises_an_exception_with_invalid_index(self):
+        lst = LinkedList([1, 2, 3])
+        with self.assertRaises(IndexError):
+            lst.get_node(5)
+        
+    
+class NodeTestCase(unittest.TestCase):
+
+    def test_creation_and_equal(self):
+        node = Node(1)
+
+        self.assertTrue(node.next is None)
+        self.assertEqual(node.elem, 1)
+        
+    def test_str(self):
+        node = Node(1)
+        self.assertEqual(str(node), "1")
+    
+    def test_equal(self):
+        first_node = Node(1)
+        second_node = Node(1)
+        self.assertTrue(first_node == second_node)
+        
+        first_node = Node(1,2)
+        second_node = Node(1,2)
+        self.assertTrue(first_node == second_node)
+        
+        second_node = "not a node"
+        self.assertFalse(first_node == second_node)
+        
+        second_node = Node(3,4)
+        self.assertFalse(first_node == second_node)
+        
+    def test_repr(self):
+        node = Node(1,4)
+        self.assertEqual(repr(node), "The value of elem: 1  The value of next: 4")
+        
+        node = Node(1)
+        self.assertEqual(repr(node), "The value of elem: 1  The value of next: None")
+    
