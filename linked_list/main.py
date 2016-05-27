@@ -1,3 +1,4 @@
+import pdb
 class AbstractLinkedList(object):
     """
     Abstract class representing the LinkedList inteface you must respect.
@@ -44,16 +45,20 @@ class Node(object):
     """
 
     def __init__(self, elem, next=None):
-        pass
+        
+        self.elem = elem
+        self.next = next
 
     def __str__(self):
-        pass
+        return str(self.elem)
 
     def __eq__(self, other):
-        pass
+        if not isinstance(other, Node):
+            return False
+        return self.elem == other.elem and self.next == other.next
 
     def __repr__(self):
-        pass
+        repr(self.elem)
 
 
 class LinkedList(AbstractLinkedList):
@@ -62,34 +67,143 @@ class LinkedList(AbstractLinkedList):
     """
 
     def __init__(self, elements=None):
-        pass
+        self.start = None
+        self.end = None
+        
+        if elements:
+            
+            self.end = Node(elements[-1])
+            node = Node(elements[0], None)
+            last_node = self.end
+            for element in reversed(elements[:-1]):
+                node = Node(element, last_node)
+                last_node = node
+            self.start = node
+    
 
     def __str__(self):
-        pass
 
+        if not self.start:
+            return "[]"
+        lst = [str(el) for el in self]
+        
+        return "[" + ", ".join(lst) + "]"
+        
     def __len__(self):
-        pass
+        return self.count()
 
     def __iter__(self):
-        pass
+        if self.start:
+            node = self.start
+            while node:
+                yield node.elem
+                if not node.next:
+                    break
+                node = node.next
+        
+            
 
     def __getitem__(self, index):
-        pass
+        if index < 0:
+            index = len(self) + index
+        count = 0
+        for elem in self:
+            if count == index:
+                return elem
+            count += 1
+            
 
     def __add__(self, other):
-        pass
+        
+        new_list = [el for el in self]
+        new_list += [el for el in other]
+        
+            
+        return LinkedList(new_list)
 
     def __iadd__(self, other):
-        pass
+        
+        for el in other:
+            self.append(el)
+            
+        return self
 
     def __eq__(self, other):
-        pass
+        if not type(self) == type(other):
+            return False
+        if not len(self) == len(other):
+            return False
+            
+        for el1, el2 in zip(self, other):
+            if el1 != el2:
+                return False
+        return True
+                
 
     def append(self, elem):
-        pass
+        node = Node(elem)
+        if self.end:
+            self.end.next = node
+        else:
+            self.start = node
+            
+        self.end = node
+
+
 
     def count(self):
-        pass
+        count = 0
+        for el in self:
+            count += 1
+        return count
 
     def pop(self, index=None):
-        pass
+    
+        if self.end == None:
+            raise IndexError()
+        
+        if index is None:
+            index = len(self) - 1
+            
+        output = self[index]
+        
+        if index == 0:
+            if len(self) == 1:
+                self.start = None
+                self.end = None
+            try:
+                self.start = self.get_node(1)
+            except:
+                self.start = None
+                
+        else:
+            node_before_pop = self.get_node(index - 1)
+            node_to_pop = self.get_node(index)
+            
+            try:
+                node_after_pop = self.get_node(index+1)
+            except:
+                node_after_pop = None
+            
+            node_before_pop.next = node_after_pop 
+            
+            
+            self.start = self.get_node(0)
+            self.end = self.get_node(-1)
+
+        return output
+    
+    def get_node(self, index):
+        if index < 0:
+            index = len(self) + index
+        node = self.start
+        count = 0
+        while node.next:
+            if count == index:
+                return node
+            count += 1
+            node = node.next
+            
+        if count < index:
+            raise IndexError("Out of range")
+        return node
